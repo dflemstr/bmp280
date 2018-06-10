@@ -1,6 +1,11 @@
 [package]
 name = "bmp280"
+description = "I2C driver for the Bosch BMP280 thermometer/barometer"
+repository = "https://github.com/dflemstr/bmp280"
+keywords = ["i2c", "barometer", "thermometer", "bosch", "bmp280"]
+categories = ["embedded", "hardware-support"]
 version = "0.1.0"
+license = "MIT"
 authors = ["David Flemström <david.flemstrom@gmail.com>"]
 
 [dependencies]
