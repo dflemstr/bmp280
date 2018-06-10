@@ -5,8 +5,8 @@
 //!   - <https://www.bosch-sensortec.com/bst/products/all_products/bmp280>
 //!   - <https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST-BMP280-DS001-19.pdf>
 #![deny(
-missing_debug_implementations, missing_copy_implementations, trivial_casts,
-trivial_numeric_casts, unused_import_braces, unused_qualifications
+    missing_debug_implementations, missing_copy_implementations, trivial_casts,
+    trivial_numeric_casts, unused_import_braces, unused_qualifications
 )]
 // TODO: #![deny(missing_docs)]
 extern crate byteorder;
@@ -44,8 +44,8 @@ struct CalibrationData {
 }
 
 impl<D> Bmp280<D>
-    where
-        D: i2cdev::core::I2CDevice,
+where
+    D: i2cdev::core::I2CDevice,
 {
     /// Create a new instance.
     ///
@@ -79,8 +79,11 @@ impl<D> Bmp280<D>
     fn read_temperature_fine(&mut self) -> error::Result<i32, D> {
         let adc_t = Bmp280::read_i24_le(&mut self.device, reg::Register::TempData)? >> 4;
 
-        let v1 = (((adc_t >> 3) - (self.calibration_data.dig_t1 << 1) as i32) * self.calibration_data.dig_t2 as i32) >> 11;
-        let v2 = (((((adc_t >> 4) - self.calibration_data.dig_t1 as i32) * ((adc_t >> 4) - self.calibration_data.dig_t1 as i32)) >> 12) * self.calibration_data.dig_t3 as i32) >> 14;
+        let v1 = (((adc_t >> 3) - (self.calibration_data.dig_t1 << 1) as i32)
+            * self.calibration_data.dig_t2 as i32) >> 11;
+        let v2 = (((((adc_t >> 4) - self.calibration_data.dig_t1 as i32)
+            * ((adc_t >> 4) - self.calibration_data.dig_t1 as i32)) >> 12)
+            * self.calibration_data.dig_t3 as i32) >> 14;
 
         Ok(v1 + v2)
     }
