@@ -5,16 +5,16 @@
 //!   - <https://www.bosch-sensortec.com/bst/products/all_products/bmp280>
 //!   - <https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST-BMP280-DS001-19.pdf>
 #![deny(
-    missing_debug_implementations, missing_copy_implementations, trivial_casts,
+    missing_docs, missing_debug_implementations, missing_copy_implementations, trivial_casts,
     trivial_numeric_casts, unused_import_braces, unused_qualifications
 )]
-// TODO: #![deny(missing_docs)]
 extern crate byteorder;
 extern crate i2cdev;
 
 pub mod error;
 pub mod reg;
 
+/// The default chip id; you can change it if you are running a different chip.
 pub const CHIP_ID: u8 = 0x58;
 
 /// An interface to a BMP280 device that can be used to control the device over I2C.
