@@ -9,7 +9,6 @@
     trivial_numeric_casts, unused_import_braces, unused_qualifications
 )]
 // TODO: #![deny(missing_docs)]
-extern crate byteorder;
 extern crate i2cdev;
 
 pub mod error;
@@ -60,7 +59,7 @@ where
 
         let calibration_data = Bmp280::read_coefficients(&mut device)?;
         device
-            .smbus_write_byte_data(reg::Register::Control as u8, 0x3f)
+            .smbus_write_byte_data(reg::Register::Control as u8, 0b00111111)
             .map_err(error::Error::I2C)?;
 
         Ok(Bmp280 {
@@ -117,30 +116,26 @@ where
     }
 
     fn read_u16_le(device: &mut D, reg: reg::Register) -> error::Result<u16, D> {
-        use byteorder::ByteOrder;
-
         let mut data = [0u8; 2];
         device
             .smbus_write_byte(reg as u8)
             .map_err(error::Error::I2C)?;
         device.read(&mut data).map_err(error::Error::I2C)?;
-        Ok(byteorder::LittleEndian::read_u16(&data))
+        let value = (data[1] as u16) << 8 | data[0] as u16;
+        Ok(value)
     }
 
     fn read_i16_le(device: &mut D, reg: reg::Register) -> error::Result<i16, D> {
-        use byteorder::ByteOrder;
-
         let mut data = [0u8; 2];
         device
             .smbus_write_byte(reg as u8)
             .map_err(error::Error::I2C)?;
         device.read(&mut data).map_err(error::Error::I2C)?;
-        Ok(byteorder::LittleEndian::read_i16(&data))
+        let value = (data[1] as i16) << 8 | data[0] as i16;
+        Ok(value)
     }
 
     fn read_i24_le(device: &mut D, reg: reg::Register) -> error::Result<i32, D> {
-        use byteorder::ByteOrder;
-
         let mut data = [0u8; 3];
         device
             .smbus_write_byte(reg as u8)
