@@ -14,7 +14,7 @@ fn main() -> Result<(), failure::Error> {
 
     loop {
         let temp = bmp.read_temperature()? + OFFSET;
-        println!("Temperature: {}°C", temp);
+        println!("{:8.5}°C", temp);
         thread::sleep(time::Duration::from_secs(1));
     }
 }
