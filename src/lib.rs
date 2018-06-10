@@ -79,11 +79,11 @@ where
     fn read_temperature_fine(&mut self) -> error::Result<i32, D> {
         let adc_t = Bmp280::read_i24_le(&mut self.device, reg::Register::TempData)? >> 4;
 
-        let v1 = (((adc_t >> 3) - (self.calibration_data.dig_t1 << 1) as i32)
-            * self.calibration_data.dig_t2 as i32) >> 11;
-        let v2 = (((((adc_t >> 4) - self.calibration_data.dig_t1 as i32)
-            * ((adc_t >> 4) - self.calibration_data.dig_t1 as i32)) >> 12)
-            * self.calibration_data.dig_t3 as i32) >> 14;
+        let v1 = (((adc_t >> 3) - (self.calibration_data.dig_t1 as i32) << 1)
+            * (self.calibration_data.dig_t2 as i32)) >> 11;
+        let v2 = (((((adc_t >> 4) - (self.calibration_data.dig_t1 as i32))
+            * ((adc_t >> 4) - (self.calibration_data.dig_t1 as i32))) >> 12)
+            * (self.calibration_data.dig_t3 as i32)) >> 14;
 
         Ok(v1 + v2)
     }
@@ -103,6 +103,7 @@ where
             dig_t1: Bmp280::read_u16_le(device, reg::Register::DigT1)?,
             dig_t2: Bmp280::read_i16_le(device, reg::Register::DigT2)?,
             dig_t3: Bmp280::read_i16_le(device, reg::Register::DigT3)?,
+
             dig_p1: Bmp280::read_u16_le(device, reg::Register::DigP1)?,
             dig_p2: Bmp280::read_i16_le(device, reg::Register::DigP2)?,
             dig_p3: Bmp280::read_i16_le(device, reg::Register::DigP3)?,
@@ -140,11 +141,13 @@ where
     fn read_i24_le(device: &mut D, reg: reg::Register) -> error::Result<i32, D> {
         use byteorder::ByteOrder;
 
-        let mut data = [0u8; 4];
+        let mut data = [0u8; 3];
         device
             .smbus_write_byte(reg as u8)
             .map_err(error::Error::I2C)?;
-        device.read(&mut data[1..]).map_err(error::Error::I2C)?;
-        Ok(byteorder::LittleEndian::read_i32(&data))
+        device.read(&mut data).map_err(error::Error::I2C)?;
+
+        let value = (data[0] as i32) << 16 | (data[1] as i32) << 8 | data[2] as i32;
+        Ok(value)
     }
 }
